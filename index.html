@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>JARVIS · FLAMTEC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B2545">
+<meta name="description" content="JARVIS FLAMTEC: entrada única a las áreas de la empresa.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="JARVIS">
+<style>
+  html, body { margin: 0; height: 100%; background: #0B2545; overflow: hidden; }
+  #jv { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: #0B2545; }
+  #carga { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+           gap: 14px; color: #fff; font: 15px/1.4 Arial, sans-serif; background: #0B2545; transition: opacity .4s; }
+  #carga img { width: 96px; height: 96px; border-radius: 22px; }
+  #carga.fuera { opacity: 0; pointer-events: none; }
+  #ayuda { display: none; max-width: 320px; text-align: center; font-size: 13px; opacity: .85; }
+  #ayuda a { color: #FF9A3C; }
+</style>
+</head>
+<body>
+<div id="carga">
+  <img src="icon-192.png" alt="">
+  <div>Abriendo JARVIS…</div>
+  <div id="ayuda">¿No abre? <a id="sola" href="#" target="_blank" rel="noopener">Ábralo aquí</a></div>
+</div>
+<iframe id="jv" title="JARVIS FLAMTEC" allow="microphone; autoplay; clipboard-write; camera"></iframe>
+<script>
+  // Dirección publicada de la entrada única de JARVIS (Apps Script). Si cambia, se cambia solo aquí.
+  var JARVIS = "https://script.google.com/macros/s/AKfycbxjMhR9zbZMFq6euNKBs2-J9pXYNHMiy1P48zYavlMCvGSN0JaqHr2tTEzTepIY7qLa/exec";
+  var f = document.getElementById("jv"), c = document.getElementById("carga");
+  document.getElementById("sola").href = JARVIS;
+  f.addEventListener("load", function () { setTimeout(function () { c.classList.add("fuera"); }, 600); });
+  setTimeout(function () { document.getElementById("ayuda").style.display = "block"; }, 12000);
+  f.src = JARVIS;
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js").catch(function () {}); }
+</script>
+</body>
+</html>
