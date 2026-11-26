@@ -39,6 +39,28 @@
   setTimeout(function () { document.getElementById("ayuda").style.display = "block"; }, 12000);
   f.src = JARVIS;
   if ("serviceWorker" in navigator) { navigator.serviceWorker.register("sw.js").catch(function () {}); }
+
+  // 25/11/2026: micrófono para «Pregúntele a JARVIS». Google no deja usar el micrófono dentro de su recuadro,
+  // así que JARVIS le pide a esta página que escuche y ella le devuelve lo que la persona dijo. No guarda nada.
+  (function () {
+    var R = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, quien = null;
+    function avisar(m) { try { if (quien) quien.postMessage(m, "*"); } catch (_) {} }
+    window.addEventListener("message", function (e) {
+      var d = e.data; if (!d || d.jarvisVoz === undefined) return;
+      if (d.jarvisVoz === "hola") { e.source && e.source.postMessage({ jarvisVoz: "lista", puede: !!R }, "*"); return; }
+      if (d.jarvisVoz === "parar") { if (rec) try { rec.stop(); } catch (_) {} return; }
+      if (d.jarvisVoz !== "escuchar") return;
+      quien = e.source;
+      if (!R) { avisar({ jarvisVoz: "error", motivo: "sin-dictado" }); return; }
+      if (rec) try { rec.abort(); } catch (_) {}
+      var r = new R(); rec = r; r.lang = "es-CO"; r.interimResults = true; r.continuous = false;
+      r.onstart = function () { avisar({ jarvisVoz: "escuchando" }); };
+      r.onresult = function (ev) { var t = ""; for (var i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript; avisar({ jarvisVoz: "texto", t: t }); };
+      r.onerror = function (ev) { avisar({ jarvisVoz: "error", motivo: ev.error || "" }); };
+      r.onend = function () { if (rec === r) rec = null; avisar({ jarvisVoz: "fin" }); };
+      try { r.start(); } catch (err) { avisar({ jarvisVoz: "error", motivo: "no-arranca" }); }
+    });
+  })();
 </script>
 </body>
 </html>
